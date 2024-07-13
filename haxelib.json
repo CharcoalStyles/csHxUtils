@@ -1,0 +1,13 @@
+{
+  "name": "CS Haxe Utils",
+  "url" : "https://github.com/CharcoalStyles/csHxUtils/",
+  "license": "MIT",
+  "tags": ["flixel", "game"],
+  "description": "Just some utilities that I've pulled together when making some HaxeFlixel projects.",
+  "version": "0.1.0",
+  "classPath": "src/",
+  "contributors": ["Charcoal"],
+  "dependencies": {
+    "flixel": ""
+  }
+}
