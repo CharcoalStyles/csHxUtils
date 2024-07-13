@@ -10,7 +10,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import haxe.Timer;
-import csHxUtils.entities.CsMenuPage;
+import csHxUtils.entities.CsMenu;
 
 typedef AnimOptions =
 {
