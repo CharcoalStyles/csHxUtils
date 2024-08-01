@@ -5,7 +5,7 @@
   "tags": ["flixel", "game"],
   "description": "Just some utilities that I've pulled together when making some HaxeFlixel projects.",
   "version": "0.1.1",
-  "classPath": "src/",
+  "classPath": "/",
   "contributors": ["Charcoal"],
   "dependencies": {
     "flixel": ""
