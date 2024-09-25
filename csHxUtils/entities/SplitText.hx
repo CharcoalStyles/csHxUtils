@@ -261,7 +261,7 @@ class SplitText extends FlxTypedGroup<FlxText>
 						tweens.push(tx);
 						return;
 					}
-					if (oneShotCallback != null)
+					if (oneShotCallback != null && i == members.length - 1)
 					{
 						oneShotCallback();
 					}
