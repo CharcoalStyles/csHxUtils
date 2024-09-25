@@ -8,7 +8,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 
-typedef Options =
+typedef SplitTextOptions =
 {
 	size:Int,
 	perCharBuffer:Float,
@@ -128,10 +128,10 @@ class SplitText extends FlxTypedGroup<FlxText>
 		return value;
 	}
 
-	private var options:Options;
+	private var options:SplitTextOptions;
 	private var originalText:String;
 
-	public function new(X:Float, Y:Float, text:String, ?options:Options)
+	public function new(X:Float, Y:Float, text:String, ?options:SplitTextOptions)
 	{
 		super();
 		originalText = text;
@@ -319,12 +319,12 @@ class SplitText extends FlxTypedGroup<FlxText>
 		}
 	}
 
-	public static var defaultOptions:Options = {
+	public static var defaultOptions:SplitTextOptions = {
 		size: 48,
 		perCharBuffer: 4,
 	};
 
-	public static function naiieveScaleDefaultOptions(scale:Float):Options
+	public static function naiieveScaleDefaultOptions(scale:Float):SplitTextOptions
 	{
 		return {
 			size: Math.round(defaultOptions.size * scale),

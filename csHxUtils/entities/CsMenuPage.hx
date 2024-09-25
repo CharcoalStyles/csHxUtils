@@ -1,5 +1,8 @@
 package csHxUtils.entities;
 
+import csHxUtils.entities.CsMenu;
+import csHxUtils.entities.SplitText;
+import csHxUtils.entities.SplitText;
 import flixel.FlxG;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
@@ -10,24 +13,31 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import haxe.Timer;
-import csHxUtils.entities.CsMenu;
 
-typedef AnimOptions =
-{
+typedef AnimOptions = {
 	unselectedColour:FlxColor,
 	?selectedColour:FlxColor,
 	?borderColour:FlxColor,
 }
 
-typedef MenuItem =
-{
-	selectable:Bool,
-	?callback:Void->Void,
-	?options:AnimOptions,
+var defaultAnimOptions:AnimOptions = {
+	unselectedColour: 0xFF202020,
+	selectedColour: 0xFF606060,
+	borderColour: 0xFFFFFFFF
 }
 
-class CsMenuPage extends FlxTypedGroup<SplitText>
-{
+typedef MenuItemOptions = {
+	?animOptions:AnimOptions,
+	?labelOptions:SplitText.SplitTextOptions,
+}
+
+typedef MenuItem = {
+	selectable:Bool,
+	?callback:Void->Void,
+	?options:MenuItemOptions
+}
+
+class CsMenuPage extends FlxTypedGroup<SplitText> {
 	var menuItems = new Array<MenuItem>();
 	var selected:Int = 0;
 	var alignment:FlxTextAlign;
@@ -39,13 +49,11 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 
 	public var rect(get, never):FlxRect;
 
-	function get_rect():FlxRect
-	{
+	function get_rect():FlxRect {
 		return FlxRect.get(minX, startY, maxX - minX, workingY - startY);
 	}
 
-	public function new(X:Float, Y:Float, align:FlxTextAlign)
-	{
+	public function new(X:Float, Y:Float, align:FlxTextAlign) {
 		super();
 		alignment = align;
 		menuItems = [];
@@ -53,30 +61,39 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 		startY = workingY = Y;
 	}
 
-	public function addLabel(label:String, ?colour:FlxColor)
-	{
-		addEntry(label, null, {unselectedColour: colour == null ? 0xFFe0e0e0 : colour});
+	public function addLabel(label:String, ?colour:FlxColor) {
+		addEntry(label, null, {animOptions: {unselectedColour: colour == null ? 0xFFe0e0e0 : colour}});
 	}
 
-	public function addItem(label:String, ?callback:Void->Void, ?options:AnimOptions)
-	{
+	public function addItem(label:String, ?callback:Void->Void, ?options:MenuItemOptions) {
 		addEntry(label, callback, options);
 	}
 
-	function addEntry(label:String, ?callback:Void->Void, ?options:AnimOptions)
-	{
-		var opt = options != null ? options : {unselectedColour: 0xFF202020, selectedColour: 0xFF606060, borderColour: 0xFFFFFFFF};
+	function addEntry(label:String, ?callback:Void->Void, ?options:MenuItemOptions) {
+		var opt:MenuItemOptions = options != null ? options : {
+			animOptions: {
+				unselectedColour: 0xFF202020,
+				selectedColour: 0xFF606060,
+				borderColour: 0xFFFFFFFF
+			},
+			labelOptions: SplitText.defaultOptions
+		}
 
-		if (opt.selectedColour == null)
-		{
-			opt.selectedColour = opt.unselectedColour;
+		if (opt.animOptions == null) {
+			opt.animOptions = defaultAnimOptions;
+		}
+		if (opt.labelOptions == null) {
+			opt.labelOptions = SplitText.defaultOptions;
+		}
+
+		if (opt.animOptions.selectedColour == null) {
+			opt.animOptions.selectedColour = opt.animOptions.unselectedColour;
 		}
 
 		menuItems.push({selectable: callback != null, callback: callback, options: opt});
 
-		var text = new SplitText(startX, workingY, label);
-		switch (alignment)
-		{
+		var text = new SplitText(startX, workingY, label, opt.labelOptions);
+		switch (alignment) {
 			case FlxTextAlign.CENTER:
 				text.x = startX - text.width / 2;
 				minX = Math.min(minX, text.x);
@@ -93,59 +110,48 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 		add(text);
 
 		var i = menuItems.filter(function(item) return item.selectable).length;
-		if (i == 1)
-		{
-			text.color = opt.selectedColour;
+		if (i == 1) {
+			text.color = opt.animOptions.selectedColour;
 			selected = menuItems.length - 1;
 			selectedAnim(selected);
-		}
-		else
-		{
-			text.color = opt.unselectedColour;
+		} else {
+			text.color = opt.animOptions.unselectedColour;
 		}
 
-		if (opt.borderColour != null)
-		{
+		if (opt.animOptions.borderColour != null) {
 			text.borderStyle = FlxTextBorderStyle.OUTLINE;
-			text.borderColor = opt.borderColour;
+			text.borderColor = opt.animOptions.borderColour;
 			text.borderSize = 2;
 		}
 
 		workingY += text.height + 16;
 	}
 
-	function onSelectedAnim(index:Int)
-	{
+	function onSelectedAnim(index:Int) {
 		var selection = members[index];
 		selection.stopAnimation();
 		var item = menuItems[index];
-		selection.animateWave(12, 0.01, 0.2, true, () ->
-		{
+		selection.animateWave(12, 0.01, 0.2, true, () -> {
 			selectedAnim(index);
 		});
-		selection.animateColour(item.options.selectedColour, 0.01, 0.2, item.options.unselectedColour, true);
+		selection.animateColour(item.options.animOptions.selectedColour, 0.01, 0.2, item.options.animOptions.unselectedColour, true);
 	}
 
-	function selectedAnim(index:Int)
-	{
+	function selectedAnim(index:Int) {
 		var selection = members[index];
 		selection.animateWave(6, 0.125, 0.8, false);
 	}
 
-	function onDeselectedAnim(index:Int)
-	{
+	function onDeselectedAnim(index:Int) {
 		var selection = members[index];
 		selection.stopAnimation();
 		var item = menuItems[index];
-		selection.animateColour(item.options.unselectedColour, 0.01, 0.2, item.options.selectedColour, true);
+		selection.animateColour(item.options.animOptions.unselectedColour, 0.01, 0.2, item.options.animOptions.selectedColour, true);
 	}
 
-	public function onInput(inputEvent:InputEvent)
-	{
-		if (inputEvent.buttonType != null)
-		{
-			switch (inputEvent.buttonType)
-			{
+	public function onInput(inputEvent:InputEvent) {
+		if (inputEvent.buttonType != null) {
+			switch (inputEvent.buttonType) {
 				case "UP":
 					moveSelected(false);
 				case "DOWN":
@@ -157,14 +163,10 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 			}
 		}
 
-		if (inputEvent.mousePos != null)
-		{
-			for (txtId in 0...members.length)
-			{
-				if (members[txtId].rect.containsPoint(inputEvent.mousePos))
-				{
-					if (txtId != selected && menuItems[txtId].selectable)
-					{
+		if (inputEvent.mousePos != null) {
+			for (txtId in 0...members.length) {
+				if (members[txtId].rect.containsPoint(inputEvent.mousePos)) {
+					if (txtId != selected && menuItems[txtId].selectable) {
 						onDeselectedAnim(selected);
 						selected = txtId;
 						onSelectedAnim(selected);
@@ -173,83 +175,64 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 			}
 		}
 
-		if (inputEvent.mouseClick != null && inputEvent.mouseClick)
-		{
+		if (inputEvent.mouseClick != null && inputEvent.mouseClick) {
 			FlxG.log.add("Mouse click");
 			menuItems[selected].callback();
 		}
 	}
 
-	function moveSelected(moveDown:Bool)
-	{
+	function moveSelected(moveDown:Bool) {
 		var direction = moveDown ? 1 : -1;
 
 		var prevSelected = selected;
 		var nextSelected = selected;
 
 		var found = false;
-		do
-		{
+		do {
 			nextSelected = FlxMath.wrap(nextSelected + direction, 0, menuItems.length - 1);
-			if (menuItems[nextSelected].selectable)
-			{
+			if (menuItems[nextSelected].selectable) {
 				found = true;
 			}
-		}
-		while (!found);
+		} while (!found);
 
-		if (nextSelected != prevSelected)
-		{
+		if (nextSelected != prevSelected) {
 			selected = nextSelected;
 			onDeselectedAnim(prevSelected);
 			onSelectedAnim(selected);
 		}
 	}
 
-	function manuallySetSelectedTop()
-	{
+	function manuallySetSelectedTop() {
 		var s = -1;
-		for (i in 0...menuItems.length)
-		{
-			if (s == -1 && menuItems[i].selectable)
-			{
-				members[i].color = menuItems[i].options.selectedColour;
+		for (i in 0...menuItems.length) {
+			if (s == -1 && menuItems[i].selectable) {
+				members[i].color = menuItems[i].options.animOptions.selectedColour;
 				s = i;
-			}
-			else
-			{
-				members[i].color = menuItems[i].options.unselectedColour;
+			} else {
+				members[i].color = menuItems[i].options.animOptions.unselectedColour;
 			}
 		}
 		selected = s;
 	}
 
-	public function show(force:Bool = false, ?callback:Void->Void)
-	{
-		if (force)
-		{
+	public function show(force:Bool = false, ?callback:Void->Void) {
+		if (force) {
 			manuallySetSelectedTop();
 			active = true;
-			for (member in members)
-			{
+			for (member in members) {
 				member.alpha = 1;
 			}
 			return;
 		}
 
-		for (i in 0...members.length)
-		{
+		for (i in 0...members.length) {
 			manuallySetSelectedTop();
-			Timer.delay(function()
-			{
+			Timer.delay(function() {
 				FlxTween.tween(members[i], {alpha: 1}, 0.5, {
-					onComplete: (t) ->
-					{
-						if (i == members.length - 1)
-						{
+					onComplete: (t) -> {
+						if (i == members.length - 1) {
 							active = true;
-							if (callback != null)
-							{
+							if (callback != null) {
 								callback();
 							}
 						}
@@ -259,26 +242,20 @@ class CsMenuPage extends FlxTypedGroup<SplitText>
 		}
 	}
 
-	public function hide(force:Bool = false, ?callback:Void->Void)
-	{
+	public function hide(force:Bool = false, ?callback:Void->Void) {
 		active = false;
 
-		if (force)
-		{
-			for (member in members)
-			{
+		if (force) {
+			for (member in members) {
 				member.alpha = 0;
 			}
 			return;
 		}
 
-		for (i in 0...members.length)
-		{
-			Timer.delay(function()
-			{
+		for (i in 0...members.length) {
+			Timer.delay(function() {
 				FlxTween.tween(members[i], {alpha: 0}, 0.5, {
-					onComplete: (t) ->
-					{
+					onComplete: (t) -> {
 						if (callback != null && i == members.length - 1)
 							callback();
 					}
