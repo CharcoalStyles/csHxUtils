@@ -176,8 +176,9 @@ class CsMenuPage extends FlxTypedGroup<SplitText> {
 		}
 
 		if (inputEvent.mouseClick != null && inputEvent.mouseClick) {
-			FlxG.log.add("Mouse click");
-			menuItems[selected].callback();
+      // Ensure the mouse is over a selectable item before invoking callback
+      if (members[selected].rect.containsPoint(inputEvent.mousePos) && menuItems[selected].selectable)
+        menuItems[selected].callback();
 		}
 	}
 
