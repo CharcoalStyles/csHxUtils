@@ -114,7 +114,7 @@ class CsMenu extends FlxTypedGroup<CsMenuPage> {
 			mousePos: null,
 			mouseClick: null,
 		};
-		var inputchanged = false;
+		var inputChanged = false;
 
 		if (inputOptions.keyboard) {
 			if (FlxG.keys.firstJustPressed() != -1) {
@@ -122,7 +122,7 @@ class CsMenu extends FlxTypedGroup<CsMenuPage> {
 
 				if (key != null) {
 					inputEvent.buttonType = key;
-					inputchanged = true;
+					inputChanged = true;
 				}
 			}
 		}
@@ -138,25 +138,25 @@ class CsMenu extends FlxTypedGroup<CsMenuPage> {
 
 			if (lastMouseState.x != mousePos.x || lastMouseState.y != mousePos.y) {
 				inputEvent.mousePos = mousePos;
-				inputchanged = true;
+				inputChanged = true;
 				// mouseClick: FlxG.mouse.justPressed ? true : null,
 			}
 
 			if (FlxG.mouse.justPressed && lastMouseState.mouseClick == false) {
 				nextMouseState.mouseClick = true;
 				inputEvent.mouseClick = true;
-				inputchanged = true;
+				inputChanged = true;
 			}
 
 			if (FlxG.mouse.justPressed && lastMouseState.mouseClick == false) {
 				nextMouseState.mouseClick = true;
 				inputEvent.mouseClick = true;
-				inputchanged = true;
+				inputChanged = true;
 			}
 			if (!FlxG.mouse.justPressed && lastMouseState.mouseClick == true) {
 				nextMouseState.mouseClick = false;
 				inputEvent.mouseClick = false;
-				inputchanged = true;
+				inputChanged = true;
 			}
 
 			lastMouseState = nextMouseState;
