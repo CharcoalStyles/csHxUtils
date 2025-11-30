@@ -135,9 +135,9 @@ class CsMenu extends FlxTypedGroup<CsMenuPage> {
 				mouseClick: false,
 				timeSinceLastUpdate: 0.0,
 			}
+			inputEvent.mousePos = mousePos;
 
 			if (lastMouseState.x != mousePos.x || lastMouseState.y != mousePos.y) {
-				inputEvent.mousePos = mousePos;
 				inputChanged = true;
 				// mouseClick: FlxG.mouse.justPressed ? true : null,
 			}
@@ -148,11 +148,6 @@ class CsMenu extends FlxTypedGroup<CsMenuPage> {
 				inputChanged = true;
 			}
 
-			if (FlxG.mouse.justPressed && lastMouseState.mouseClick == false) {
-				nextMouseState.mouseClick = true;
-				inputEvent.mouseClick = true;
-				inputChanged = true;
-			}
 			if (!FlxG.mouse.justPressed && lastMouseState.mouseClick == true) {
 				nextMouseState.mouseClick = false;
 				inputEvent.mouseClick = false;
